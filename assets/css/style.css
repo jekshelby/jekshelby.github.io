@@ -1,0 +1,67 @@
+:root {
+    --abu: #6F6F73;
+    --hijau: #4D5940;
+    --cokelat: #59412C;
+    --dark: #26221A;
+    --putih: #F2F2F2;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--dark);
+}
+
+.nav {
+    display: flex;
+    justify-content: center;
+    border-bottom: solid 5px;
+    padding: 1rem;
+    color: white;
+    background-color: var(--cokelat);
+}
+
+.foto {
+    height: 20vh;
+    width: 20vh;
+    border-radius: 50%;
+    border: solid 4px;
+    margin-bottom: 1rem;
+}
+
+.nav h1 {
+    margin-top: 1em;
+    margin-left: 3rem;
+}
+
+.bungkus {
+    display: inline-flex;
+}
+
+.right {
+    background-color: var(--hijau);
+    min-width: 25%;
+    padding: 1rem;
+}
+.right .kotak {
+    border: solid 3px;
+    border-radius: 5px;
+    padding-left: 2rem;
+    margin-bottom: 1rem;
+}
+
+.left {
+    background-color: var(--abu);
+    width: 75%;
+    padding: 1rem;
+}
+.left ul {
+    border: solid;
+}
+
+.left ul p {
+    padding: 1rem;
+}
