@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;600&display=swap');
+
+:root {
+    --bt : #6096B4;
+    --b : #93BFCF;
+    --bm : #BDCDD6;
+    --dasar : #EEE9DA;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--dasar);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Popins', sans-serif;
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    min-height: 1000px;
+    display: grid;
+    grid-template-columns: 1fr 1.7fr;
+}
+
+.container .left-side {
+    position: relative;
+    background-color: var(--bm);
+    padding: 40px;
+}
+
+.container .right-side {
+    position: relative;
+    background-color: var(--bt);
+    padding: 40px;
+}
+
+.profil {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-bottom: solid;
+}
+
+.profil .poto {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    margin-bottom: 2rem;
+}
+
+.profil .poto img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: solid var(--dasar) 5px;
+}
+
+.profil h3{
+    color: white;
+    margin-top: 1rem;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.kontak {
+    position: relative;
+    margin-top: 1.3rem;
+    color: white;
+}
+
+.kontak ul {
+    position: relative;
+}
+
+.kontak ul li {
+    position: relative;
+    list-style: none;
+    margin: 10px 0;
+}
+
+.kontak ul li .icon {
+    color: var(--bt);
+    size: 80%;
+}
+
+.pendidikan {
+    margin-top: 2rem;
+}
+
+.pendidikan ul{
+    position: relative;
+}
+
+.pendidikan ul li {
+    list-style: none;
+    margin: 10px 0;
+}
+
+.pendidikan ul li h4 {
+    color: grey;
+}
+
+.pendidikan ul li .text {
+    color: var(--bt);
+}
+
+.keahlian {
+    margin-top: 2rem;
+}
+
+.keahlian ul {
+    position: relative;
+}
+
+.keahlian ul li {
+    list-style: none;
+    margin: 10px 0;
+}
+
+.right-side .nama {
+    color: white;
+    text-transform: uppercase;
+    padding: 15px;
+    text-align: center;
+    border-bottom: solid;
+    margin-bottom: 1rem;
+}
+
+.right-side .head {
+    color: var(--dasar);
+    border-bottom: solid;
+    position: relative;
+}
+
+.right-side .head h2 {
+    background-color: var(--b);
+    padding: 5px;
+    border-radius: 5px 5px 5px 0px;
+}
+
+.right-side .head p {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.right-side .work {
+    margin-top: 1rem;
+    position: relative;
+    color: var(--dasar);
+}
+
+.right-side .work h2 {
+    background-color: var(--b);
+    padding: 5px;
+    border-radius: 5px 5px 5px 0px;
+}
+
+.right-side .work ul {
+    margin-top: 1rem;
+}
+
+.right-side .work ul li {
+    list-style: none;
+    padding: 10px 0;
+}
+
+.right-side .work ul li h3 {
+    color: var(--bm);
+}
