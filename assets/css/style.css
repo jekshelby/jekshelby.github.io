@@ -9,59 +9,38 @@
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+    list-style: none;
+    color: white;
 }
 
 body {
-    background-color: var(--dark);
+    background-image: url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ae2fa3ca-0851-4f3c-b276-0c5b7412e428/dab5iba-a1a69f7c-9c78-490e-a22d-8f6b007e6786.png/v1/fill/w_1024,h_627,q_80,strp/362_365_cheetos_by_snatti89_dab5iba-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NjI3IiwicGF0aCI6IlwvZlwvYWUyZmEzY2EtMDg1MS00ZjNjLWIyNzYtMGM1Yjc0MTJlNDI4XC9kYWI1aWJhLWExYTY5ZjdjLTljNzgtNDkwZS1hMjJkLThmNmIwMDdlNjc4Ni5wbmciLCJ3aWR0aCI6Ijw9MTAyNCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.tvrUPtgcypJaGZpgD_d28v5QkLBAIBBzOiYMiOu1xJw');
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .nav {
+    outline: none;
+    border: none;
+    text-decoration: none;
     display: flex;
-    justify-content: center;
-    border-bottom: solid 5px;
-    padding: 1rem;
-    color: white;
-    background-color: var(--cokelat);
-}
-
-.foto {
-    height: 20vh;
-    width: 20vh;
-    border-radius: 50%;
-    border: solid 4px;
-    margin-bottom: 1rem;
+    justify-content: space-around;
+    align-items: center;
+    border-bottom: solid;
+    background-color: black;
 }
 
 .nav h1 {
-    margin-top: 1em;
-    margin-left: 3rem;
+    font-weight: 800;
+    font-size: 2.4rem;
 }
 
-.bungkus {
-    display: inline-flex;
-}
-
-.right {
-    background-color: var(--hijau);
-    min-width: 25%;
-    padding: 1rem;
-}
-.right .kotak {
-    border: solid 3px;
-    border-radius: 5px;
-    padding-left: 2rem;
-    margin-bottom: 1rem;
-}
-
-.left {
-    background-color: var(--abu);
-    width: 75%;
-    padding: 1rem;
-}
-.left ul {
-    border: solid;
-}
-
-.left ul p {
-    padding: 1rem;
+.nav .navbar-nav a {
+    display: inline-block;
+    font-size: 1rem;
+    margin: 0 1.2rem;
+    text-transform: uppercase;
 }
