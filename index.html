@@ -11,6 +11,18 @@
         body {
             margin: 0;
         }
+
+        @media (min-width: 1200px) {
+
+            /* Gaya khusus untuk layar lebih besar dari 1200px */
+            .full {
+                margin-left: 332px;
+            }
+
+            .sidebar {
+                position: fixed;
+            }
+        }
     </style>
     <title>Homepage</title>
     <!-- <link rel="stylesheet" href="assets/css/style.css"> -->
@@ -33,7 +45,8 @@
     </nav> -->
     <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-3 bg-black text-white text-center" style="height: 100vh;">
+            <!-- sidebar -->
+            <div class="col-lg-3 bg-black text-white text-center sidebar" style="height: 100vh;">
                 <!-- <div class="bg-dark rounded-circle d-flex" style="width: 100px; height: 100px;">dsf</div> -->
                 <div class="img text-center">
                     <img class="rounded-circle mt-5 mb-3" src="assets/images/Pas Foto.JPG" alt="df"
@@ -56,7 +69,7 @@
             </div>
 
 
-            <div class="col-lg-9">
+            <div class="col-lg-9 full">
                 <!-- about -->
                 <div class="container mt-5 mb-5">
                     <div class="row">
@@ -128,7 +141,8 @@
                                     <h5>Politeknik Negeri Lhokseumawe</h5>
                                     <p>Informatics Engineering</p>
                                     <p class="text-muted">2022 - Until Now</p>
-                                    <p class="text-white">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolore voluptatibus
+                                    <p class="text-white">Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                                        Dolore voluptatibus
                                         reiciendis
                                         necessitatibus id sunt cum impedit placeat aspernatur nihil quo quae
                                         consequuntur,
