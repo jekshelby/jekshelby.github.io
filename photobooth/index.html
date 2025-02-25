@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoBooth App</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-bottom: 40px;
+        }
+
+        .camera-container {
+            position: relative;
+            margin: 0 auto;
+            max-width: 640px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        #video {
+            width: 100%;
+            background-color: #000;
+            border-radius: 8px;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .controls {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 0 0 8px 8px;
+        }
+
+        .photo-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .photo-item {
+            position: relative;
+            width: calc(33.333% - 7px);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .photo-collage {
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .filter-btn.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .filters-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 100px;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+            display: none;
+        }
+
+        .flash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #collageImage {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Page transition */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Animation */
+        .fadeIn {
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 100;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .collage-page-header,
+        .preview-page-header {
+            background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .preview-container {
+            position: relative;
+            margin: 0 auto;
+            max-width: 640px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        #previewImage {
+            width: 100%;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-header">
+        <div class="container">
+            <h1 class="text-center"><i class="fas fa-camera"></i> PhotoBooth App</h1>
+        </div>
+    </div>
+
+    <!-- Halaman 1: Kamera dan Pengambilan Foto -->
+    <div id="cameraPage" class="page active fadeIn">
+        <div class="container">
+            <div class="camera-container">
+                <video id="video" autoplay playsinline></video>
+                <div class="countdown" id="countdown">3</div>
+                <div class="flash" id="flash"></div>
+                <canvas id="canvas"></canvas>
+
+                <div class="controls">
+                    <div class="filters-container">
+                        <button class="btn btn-sm btn-outline-primary filter-btn active"
+                            data-filter="normal">Normal</button>
+                        <button class="btn btn-sm btn-outline-primary filter-btn"
+                            data-filter="grayscale">Grayscale</button>
+                        <button class="btn btn-sm btn-outline-primary filter-btn" data-filter="sepia">Sepia</button>
+                        <button class="btn btn-sm btn-outline-primary filter-btn" data-filter="invert">Invert</button>
+                        <button class="btn btn-sm btn-outline-primary filter-btn"
+                            data-filter="brightness">Bright</button>
+                    </div>
+
+                    <div class="d-grid">
+                        <button id="capture-btn" class="btn btn-lg btn-danger">
+                            <i class="fas fa-camera"></i> Ambil Foto (<span id="photos-count">0</span>/3)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Foto-foto Anda</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="photo-gallery" id="photoGallery"></div>
+
+                            <div class="text-center mt-3">
+                                <button id="createCollageBtn" class="btn btn-success" disabled>
+                                    <i class="fas fa-images"></i> Buat Kolase
+                                </button>
+                                <button id="restartBtn" class="btn btn-primary">
+                                    <i class="fas fa-redo"></i> Mulai Ulang
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Halaman 2: Preview Foto -->
+    <div id="previewPage" class="page fadeIn">
+        <button id="backFromPreview" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+
+        <div class="preview-page-header">
+            <div class="container">
+                <h2 class="text-center text-white"><i class="fas fa-image"></i> Preview Foto</h2>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Preview Foto</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="preview-container">
+                                <img id="previewImage" class="img-fluid" />
+                            </div>
+                            <div class="mt-3">
+                                <button id="downloadPreview" class="btn btn-primary">
+                                    <i class="fas fa-download"></i> Unduh Foto
+                                </button>
+                                <button id="backToGalleryFromPreview" class="btn btn-secondary">
+                                    <i class="fas fa-chevron-left"></i> Kembali ke Galeri
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Halaman 3: Preview Kolase -->
+    <div id="collagePage" class="page fadeIn">
+        <button id="backToCamera" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+
+        <div class="collage-page-header">
+            <div class="container">
+                <h2 class="text-center text-white"><i class="fas fa-images"></i> Preview Kolase</h2>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Kolase Foto Anda</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="photo-collage">
+                                <img id="collageImage" class="img-fluid" />
+                            </div>
+                            <button id="downloadCollage" class="btn btn-success mt-3">
+                                <i class="fas fa-download"></i> Unduh Kolase
+                            </button>
+                            <button id="backToGalleryBtn" class="btn btn-primary mt-3">
+                                <i class="fas fa-chevron-left"></i> Kembali ke Foto
+                            </button>
+                            <button id="newSessionBtn" class="btn btn-danger mt-3">
+                                <i class="fas fa-plus"></i> Sesi Baru
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas untuk menggambar kolase (hidden) -->
+    <canvas id="collageCanvas" style="display:none;"></canvas>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Variabel global
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const captureBtn = document.getElementById('capture-btn');
+        const photoGallery = document.getElementById('photoGallery');
+        const photosCount = document.getElementById('photos-count');
+        const collageCanvas = document.getElementById('collageCanvas');
+        const ctxCollage = collageCanvas.getContext('2d');
+        const downloadCollage = document.getElementById('downloadCollage');
+        const restartBtn = document.getElementById('restartBtn');
+        const countdownEl = document.getElementById('countdown');
+        const flashEl = document.getElementById('flash');
+        const createCollageBtn = document.getElementById('createCollageBtn');
+        const backToCamera = document.getElementById('backToCamera');
+        const backToGalleryBtn = document.getElementById('backToGalleryBtn');
+        const newSessionBtn = document.getElementById('newSessionBtn');
+        const cameraPage = document.getElementById('cameraPage');
+        const previewPage = document.getElementById('previewPage');
+        const collagePage = document.getElementById('collagePage');
+        const backFromPreview = document.getElementById('backFromPreview');
+        const backToGalleryFromPreview = document.getElementById('backToGalleryFromPreview');
+        const downloadPreview = document.getElementById('downloadPreview');
+        const previewImage = document.getElementById('previewImage');
+        let currentPreviewUrl = '';
+        let currentPreviewIndex = -1;
+        let filterButtons = document.querySelectorAll('.filter-btn');
+
+        let currentFilter = 'normal';
+        let photosTaken = [];
+        let stream = null;
+
+        // Fungsi untuk mengatur halaman
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Inisialisasi kamera
+        async function initCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    },
+                    audio: false
+                });
+                video.srcObject = stream;
+
+                // Atur ukuran canvas sesuai video setelah video dimuat
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+
+                    // Ubah ukuran canvas kolase untuk format vertikal (potret)
+                    // Tingginya menjadi 3x tinggi foto tunggal
+                    collageCanvas.width = video.videoWidth;
+                    collageCanvas.height = video.videoHeight * 3 + 200; // Tambah ruang untuk header
+                };
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                alert('Tidak dapat mengakses kamera. Pastikan Anda mengizinkan akses kamera dan tidak ada aplikasi lain yang sedang menggunakannya.');
+            }
+        }
+
+        // Fungsi untuk mengambil foto dengan countdown
+        function takePhoto() {
+            if (photosTaken.length >= 3) return;
+
+            let count = 3;
+            countdownEl.textContent = count;
+            countdownEl.style.display = 'block';
+
+            const countdownInterval = setInterval(() => {
+                count--;
+                countdownEl.textContent = count;
+
+                if (count === 0) {
+                    clearInterval(countdownInterval);
+                    countdownEl.style.display = 'none';
+                    capturePhoto();
+                }
+            }, 1000);
+        }
+
+        // Fungsi untuk menangkap foto dari video
+        function capturePhoto() {
+            // Menampilkan efek flash
+            flashEl.style.opacity = '0.8';
+            setTimeout(() => {
+                flashEl.style.opacity = '0';
+            }, 200);
+
+            // Menggambar frame dari video ke canvas
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Menerapkan filter yang dipilih
+            applyFilter(ctx, canvas.width, canvas.height, currentFilter);
+
+            // Mengambil URL data dari canvas
+            const photoDataUrl = canvas.toDataURL('image/jpeg');
+
+            // Menambahkan foto ke array
+            photosTaken.push({
+                url: photoDataUrl,
+                filter: currentFilter
+            });
+
+            // Memperbarui tampilan
+            updatePhotoGallery();
+
+            // Cek apakah sudah mengambil 3 foto
+            if (photosTaken.length === 3) {
+                captureBtn.disabled = true;
+                createCollageBtn.disabled = false;
+            }
+        }
+
+        // Fungsi untuk menerapkan filter pada canvas
+        function applyFilter(context, width, height, filter) {
+            // Mendapatkan data pixel
+            const imageData = context.getImageData(0, 0, width, height);
+            const data = imageData.data;
+
+            // Menerapkan filter
+            switch (filter) {
+                case 'grayscale':
+                    for (let i = 0; i < data.length; i += 4) {
+                        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                        data[i] = avg;
+                        data[i + 1] = avg;
+                        data[i + 2] = avg;
+                    }
+                    break;
+                case 'sepia':
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i];
+                        const g = data[i + 1];
+                        const b = data[i + 2];
+
+                        data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
+                        data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
+                        data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
+                    }
+                    break;
+                case 'invert':
+                    for (let i = 0; i < data.length; i += 4) {
+                        data[i] = 255 - data[i];
+                        data[i + 1] = 255 - data[i + 1];
+                        data[i + 2] = 255 - data[i + 2];
+                    }
+                    break;
+                case 'brightness':
+                    for (let i = 0; i < data.length; i += 4) {
+                        data[i] = Math.min(255, data[i] * 1.2);
+                        data[i + 1] = Math.min(255, data[i + 1] * 1.2);
+                        data[i + 2] = Math.min(255, data[i + 2] * 1.2);
+                    }
+                    break;
+                // Normal tidak perlu filter
+            }
+
+            // Memperbarui data pixel
+            context.putImageData(imageData, 0, 0);
+        }
+
+        // Menerapkan filter pada video secara real-time
+        function applyVideoFilter() {
+            if (currentFilter === 'normal') {
+                video.style.filter = 'none';
+            } else if (currentFilter === 'grayscale') {
+                video.style.filter = 'grayscale(100%)';
+            } else if (currentFilter === 'sepia') {
+                video.style.filter = 'sepia(100%)';
+            } else if (currentFilter === 'invert') {
+                video.style.filter = 'invert(100%)';
+            } else if (currentFilter === 'brightness') {
+                video.style.filter = 'brightness(130%)';
+            }
+        }
+
+        // Menampilkan halaman preview foto
+        function showPhotoPreview(index) {
+            if (index >= 0 && index < photosTaken.length) {
+                currentPreviewUrl = photosTaken[index].url;
+                currentPreviewIndex = index;
+                previewImage.src = currentPreviewUrl;
+                showPage('previewPage');
+            }
+        }
+
+        // Memperbarui galeri foto
+        function updatePhotoGallery() {
+            photoGallery.innerHTML = '';
+            photosCount.textContent = photosTaken.length;
+
+            // Aktifkan/nonaktifkan tombol buat kolase
+            createCollageBtn.disabled = photosTaken.length < 3;
+
+            photosTaken.forEach((photo, index) => {
+                const photoContainer = document.createElement('div');
+                photoContainer.className = 'photo-item';
+
+                const img = document.createElement('img');
+                img.src = photo.url;
+                img.style.cursor = 'pointer';
+                img.onclick = () => showPhotoPreview(index);
+                photoContainer.appendChild(img);
+
+                const controls = document.createElement('div');
+                controls.className = 'p-2 bg-light d-flex justify-content-between';
+
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'btn btn-sm btn-outline-primary';
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+                downloadBtn.onclick = (e) => {
+                    e.stopPropagation(); // Mencegah event click memicu preview
+                    downloadPhoto(photo.url, `photo-${index + 1}.jpg`);
+                };
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn btn-sm btn-outline-danger';
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation(); // Mencegah event click memicu preview
+                    deletePhoto(index);
+                };
+
+                controls.appendChild(downloadBtn);
+                controls.appendChild(deleteBtn);
+
+                photoContainer.appendChild(controls);
+                photoGallery.appendChild(photoContainer);
+            });
+        }
+
+        // Menghapus foto
+        function deletePhoto(index) {
+            photosTaken.splice(index, 1);
+            updatePhotoGallery();
+
+            if (photosTaken.length < 3) {
+                captureBtn.disabled = false;
+                createCollageBtn.disabled = true;
+            }
+        }
+
+        // Mengunduh foto
+        function downloadPhoto(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = filename;
+            link.click();
+        }
+
+        // Membuat kolase vertikal dari foto yang diambil
+        function createVerticalCollage() {
+            if (photosTaken.length < 3) return;
+
+            const canvasWidth = collageCanvas.width;
+            const canvasHeight = collageCanvas.height;
+            const photoHeight = (canvasHeight - 200) / 3; // Mengurangi ruang untuk header
+
+            // Membersihkan canvas
+            ctxCollage.clearRect(0, 0, canvasWidth, canvasHeight);
+
+            // Warna gradien latar belakang
+            const gradient = ctxCollage.createLinearGradient(0, 0, 0, canvasHeight);
+            gradient.addColorStop(0, "#8e44ad");   // Ungu
+            gradient.addColorStop(0.5, "#3498db"); // Biru
+            gradient.addColorStop(1, "#2ecc71");   // Hijau
+
+            ctxCollage.fillStyle = gradient;
+            ctxCollage.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            // Menggambar header kolase dengan gaya menarik
+            // Area header
+            ctxCollage.fillStyle = "rgba(0, 0, 0, 0.5)";
+            ctxCollage.fillRect(0, 0, canvasWidth, 150);
+
+            // Judul kolase
+            ctxCollage.fillStyle = '#ffffff';
+            ctxCollage.font = 'bold 40px Arial';
+            ctxCollage.textAlign = 'center';
+            ctxCollage.fillText('PhotoBooth Collage', canvasWidth / 2, 60);
+
+            // Garis pembatas
+            ctxCollage.strokeStyle = '#ffffff';
+            ctxCollage.lineWidth = 2;
+            ctxCollage.beginPath();
+            ctxCollage.moveTo(canvasWidth / 4, 80);
+            ctxCollage.lineTo(canvasWidth * 3 / 4, 80);
+            ctxCollage.stroke();
+
+            // Tanggal dan waktu
+            const date = new Date();
+            ctxCollage.font = '20px Arial';
+            ctxCollage.fillText(date.toLocaleString(), canvasWidth / 2, 120);
+
+            // Menggambar setiap foto dalam tata letak vertikal
+            const margin = 20;
+            const photoWidth = canvasWidth - (margin * 2);
+
+            // Menggambar border putih di sekitar foto
+            function drawPhotoWithBorder(img, x, y, w, h, borderSize, borderColor) {
+                // Menggambar border
+                ctxCollage.fillStyle = borderColor;
+                ctxCollage.fillRect(x - borderSize, y - borderSize, w + (borderSize * 2), h + (borderSize * 2));
+
+                // Menggambar foto
+                ctxCollage.drawImage(img, x, y, w, h);
+
+                // Menggambar bayangan
+                ctxCollage.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctxCollage.shadowBlur = 15;
+                ctxCollage.shadowOffsetX = 5;
+                ctxCollage.shadowOffsetY = 5;
+
+                // Reset bayangan
+                ctxCollage.shadowColor = 'transparent';
+                ctxCollage.shadowBlur = 0;
+                ctxCollage.shadowOffsetX = 0;
+                ctxCollage.shadowOffsetY = 0;
+            }
+
+            // Label untuk setiap foto
+            function drawPhotoLabel(text, x, y) {
+                ctxCollage.fillStyle = 'white';
+                ctxCollage.font = 'bold 16px Arial';
+                ctxCollage.textAlign = 'left';
+                ctxCollage.fillText(text, x, y);
+            }
+
+            // Warna border untuk setiap foto
+            const borderColors = ['#e74c3c', '#f39c12', '#3498db'];
+
+            // Menggambar setiap foto
+            let photosLoaded = 0;
+            for (let i = 0; i < photosTaken.length; i++) {
+                const img = new Image();
+                img.onload = () => {
+                    const y = 150 + (i * photoHeight) + margin;
+
+                    // Menggambar foto dengan border berwarna
+                    drawPhotoWithBorder(
+                        img,
+                        margin,
+                        y,
+                        photoWidth,
+                        photoHeight - (margin * 2),
+                        10,
+                        borderColors[i]
+                    );
+
+                    // Menambahkan label foto
+                    drawPhotoLabel(`Foto #${i + 1}`, margin, y - 5);
+
+                    // Menambahkan dekorasi
+                    // Menggambar ikon kamera kecil
+                    ctxCollage.fillStyle = borderColors[i];
+                    ctxCollage.beginPath();
+                    ctxCollage.arc(canvasWidth - 40, y - 5, 15, 0, Math.PI * 2);
+                    ctxCollage.fill();
+
+                    ctxCollage.fillStyle = 'white';
+                    ctxCollage.font = '15px FontAwesome';
+                    ctxCollage.textAlign = 'center';
+                    ctxCollage.fillText('\uf030', canvasWidth - 40, y);
+
+                    photosLoaded++;
+
+                    // Menyimpan kolase sebagai URL data dan tampilkan di halaman kolase
+                    if (photosLoaded === photosTaken.length) {
+                        const collageDataUrl = collageCanvas.toDataURL('image/jpeg');
+                        document.getElementById('collageImage').src = collageDataUrl;
+                    }
+                };
+                img.src = photosTaken[i].url;
+            }
+        }
+
+        // Menangani navigasi halaman
+        createCollageBtn.addEventListener('click', () => {
+            createVerticalCollage();
+            showPage('collagePage');
+        });
+
+        backToCamera.addEventListener('click', () => {
+            showPage('cameraPage');
+        });
+
+        backToGalleryBtn.addEventListener('click', () => {
+            showPage('cameraPage');
+        });
+
+        backFromPreview.addEventListener('click', () => {
+            showPage('cameraPage');
+        });
+
+        backToGalleryFromPreview.addEventListener('click', () => {
+            showPage('cameraPage');
+        });
+
+        downloadPreview.addEventListener('click', () => {
+            if (currentPreviewUrl) {
+                downloadPhoto(currentPreviewUrl, `photo-preview-${currentPreviewIndex + 1}.jpg`);
+            }
+        });
+
+        // Reset semua dan mulai sesi baru
+        function resetSession() {
+            photosTaken = [];
+            updatePhotoGallery();
+            captureBtn.disabled = false;
+            createCollageBtn.disabled = true;
+            showPage('cameraPage');
+        }
+
+        // Menangani tombol restart dan sesi baru
+        restartBtn.addEventListener('click', resetSession);
+        newSessionBtn.addEventListener('click', resetSession);
+
+        // Menangani tombol unduh kolase
+        downloadCollage.addEventListener('click', () => {
+            const collageDataUrl = collageCanvas.toDataURL('image/jpeg');
+            downloadPhoto(collageDataUrl, 'photobooth-collage.jpg');
+        });
+
+        // Menangani tombol ambil foto
+        captureBtn.addEventListener('click', takePhoto);
+
+        // Menangani tombol filter
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Menghapus kelas active dari semua tombol
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+
+                // Menambahkan kelas active ke tombol yang diklik
+                button.classList.add('active');
+
+                // Memperbarui filter saat ini
+                currentFilter = button.getAttribute('data-filter');
+
+                // Menerapkan filter pada video
+                applyVideoFilter();
+            });
+        });
+
+        // Mulai aplikasi
+        initCamera();
+    </script>
+</body>
+
+</html>
