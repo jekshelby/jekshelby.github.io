@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>EzCalSteam - Kalkulator Saldo Steam</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#a1d9ff",
+                        "primary-container": "#66c0f4",
+                        "surface": "#061423",
+                        "surface-variant": "#293646",
+                        "on-surface": "#d6e3f9",
+                        "on-surface-variant": "#bfc8d0",
+                        "outline-variant": "#3f484f",
+                        "tertiary": "#ffc97b",
+                        "error": "#ffb4ab"
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #061423;
+            background-image:
+                radial-gradient(at 0% 0%, #1b2838 0px, transparent 50%),
+                radial-gradient(at 100% 100%, #0f1c2c 0px, transparent 50%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .steam-card {
+            background: linear-gradient(180deg, #2a475e 0%, #1b2838 100%);
+            border: 1px solid #3f484f;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .steam-input {
+            width: 100%;
+            background-color: #0f1c2c !important;
+            border: 1px solid #2a475e;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+
+            color: #ffffff !important;
+            caret-color: #ffffff;
+
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .steam-input:focus {
+            outline: none;
+            border-color: #66c0f4;
+            box-shadow:
+                0 0 0 2px rgba(102, 192, 244, 0.2),
+                inset 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .steam-input::placeholder {
+            color: #8fa3b8 !important;
+            opacity: 1;
+        }
+
+        .steam-button-primary {
+            background: linear-gradient(180deg, #66c0f4 0%, #316282 100%);
+            border-top: 1px solid #a1d9ff;
+        }
+    </style>
+</head>
+
+<body class="text-on-surface overflow-x-hidden">
+
+    <!-- HEADER -->
+    <header class="bg-[#171a21] border-b border-outline-variant shadow-sm fixed top-0 w-full z-50">
+
+        <nav class="flex justify-between items-center w-full px-6 h-16 max-w-7xl mx-auto">
+
+            <div class="flex items-center gap-2">
+
+                <span class="text-xl md:text-2xl font-extrabold text-white tracking-tight">
+                    EzCal<span class="text-primary-container">Steam</span>
+                </span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN -->
+    <main class="pt-24 pb-12 px-4 md:px-8 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- TITLE -->
+        <div class="lg:col-span-12">
+
+            <h1 class="text-3xl md:text-4xl font-bold text-on-surface mb-2">
+                Kalkulator Saldo Steam
+            </h1>
+
+            <p class="text-on-surface-variant text-sm md:text-base">
+                Hitung harga jual item dan estimasi pencairan dana secara akurat.
+            </p>
+        </div>
+
+        <!-- LEFT -->
+        <div class="lg:col-span-7">
+
+            <div class="steam-card rounded-xl p-6 flex flex-col gap-6 border-2 border-primary-container/30">
+
+                <!-- HEADER -->
+                <div class="flex items-center gap-2 border-b border-outline-variant pb-4">
+
+                    <span class="material-symbols-outlined text-primary">
+                        calculate
+                    </span>
+
+                    <h2 class="text-xl font-semibold">
+                        Kalkulator Transaksi
+                    </h2>
+                </div>
+
+                <!-- INPUT -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- RECEIVE -->
+                    <div class="flex flex-col gap-2">
+
+                        <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+                            Target "You Receive" (Bersih)
+                        </label>
+
+                        <div class="relative">
+
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-bold z-10">
+                                Rp
+                            </span>
+
+                            <input id="input-receive" class="steam-input pl-12 pr-4 py-3 rounded-lg"
+                                placeholder="100000" type="text" value="100000" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <!-- RATE -->
+                    <div class="flex flex-col gap-2">
+
+                        <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+                            Conversion Rate
+                        </label>
+
+                        <div class="relative">
+
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-bold z-10">
+                                0.
+                            </span>
+
+                            <input id="input-rate" class="steam-input pl-12 pr-4 py-3 rounded-lg" placeholder="80"
+                                type="text" value="80" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RESULT -->
+                <div class="bg-black/20 rounded-lg p-6 border border-outline-variant flex flex-col gap-4">
+
+                    <div class="flex justify-between items-center gap-4">
+
+                        <span class="text-on-surface-variant text-sm md:text-base">
+                            Buyer Pays (Harga Market)
+                        </span>
+
+                        <span id="display-buyer-pays" class="text-tertiary text-xl md:text-2xl font-bold">
+                            Rp 115.000
+                        </span>
+                    </div>
+
+                    <div class="h-px bg-outline-variant w-full"></div>
+
+                    <div class="flex justify-between items-center gap-4">
+
+                        <span class="text-on-surface-variant text-sm md:text-base">
+                            Total Transfer ke Rekening
+                        </span>
+
+                        <div class="text-right">
+
+                            <span id="display-total-transfer"
+                                class="text-primary text-3xl md:text-4xl font-black block">
+                                Rp 80.000
+                            </span>
+
+                            <span class="text-on-surface-variant text-[10px] uppercase tracking-widest font-bold">
+                                Saldo Bersih × Rate
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BUTTON -->
+                <div class="flex flex-wrap gap-4">
+
+                    <button onclick="calculate()"
+                        class="steam-button-primary flex-1 py-4 rounded-lg text-white font-bold uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2">
+
+                        <span class="material-symbols-outlined">
+                            refresh
+                        </span>
+
+                        Calculate
+                    </button>
+
+                    <button onclick="resetCalc()"
+                        class="px-6 py-4 border border-error/30 text-error hover:bg-error/10 rounded-lg font-bold uppercase tracking-widest active:scale-95 transition-all">
+
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+
+            <div class="steam-card rounded-xl overflow-hidden">
+
+                <div class="h-24 bg-surface-variant/50 relative flex items-center px-6">
+
+                    <div class="flex items-center gap-3">
+
+                        <span class="material-symbols-outlined text-tertiary text-3xl">
+                            info
+                        </span>
+
+                        <h3 class="text-xl font-bold">
+                            Steam Market Tax
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="p-6 flex flex-col gap-4">
+
+                    <p class="text-on-surface-variant text-sm leading-relaxed">
+                        Setiap transaksi di Steam Community Market dikenakan biaya total sebesar
+                        <strong class="text-on-surface text-base">15%</strong>.
+                    </p>
+
+                    <ul class="flex flex-col gap-3">
+
+                        <li class="flex items-center gap-3 text-sm">
+
+                            <span class="material-symbols-outlined text-primary text-xl">
+                                payments
+                            </span>
+
+                            <span>Steam Fee: 5%</span>
+                        </li>
+
+                        <li class="flex items-center gap-3 text-sm">
+
+                            <span class="material-symbols-outlined text-primary text-xl">
+                                sports_esports
+                            </span>
+
+                            <span>Game Developer Fee: 10%</span>
+                        </li>
+                    </ul>
+
+                    <div class="bg-primary/10 p-4 rounded-lg border-l-4 border-primary mt-2">
+
+                        <p class="text-xs text-primary leading-tight italic">
+                            Rumus: Buyer Pays = You Receive × 1.15
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full py-8 border-t border-outline-variant mt-12 bg-[#171a21]">
+
+        <div class="text-center text-on-surface-variant text-xs">
+            &copy; 2026 jekshelby | Steam Calculator for Suntik Wallet
+        </div>
+    </footer>
+
+    <script>
+
+        const inputReceive = document.getElementById('input-receive');
+        const inputRate = document.getElementById('input-rate');
+
+        const displayBuyerPays = document.getElementById('display-buyer-pays');
+        const displayTotalTransfer = document.getElementById('display-total-transfer');
+
+        // FORMAT RUPIAH
+        function formatRupiah(number) {
+
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(number);
+        }
+
+        // HANYA ANGKA
+        function allowOnlyNumbers(input) {
+
+            input.addEventListener('input', function () {
+
+                this.value = this.value.replace(/[^0-9]/g, '');
+
+                calculate();
+            });
+        }
+
+        allowOnlyNumbers(inputReceive);
+        allowOnlyNumbers(inputRate);
+
+        // HITUNG
+        function calculate() {
+
+            const receive = parseInt(inputReceive.value) || 0;
+
+            // otomatis jadi 0.xx
+            const rate = parseFloat("0." + (inputRate.value || 0));
+
+            // buyer pays +15%
+            const buyerPays = Math.ceil(receive * 1.15);
+
+            // transfer
+            const totalTransfer = Math.round(receive * rate);
+
+            // update ui
+            displayBuyerPays.innerText = formatRupiah(buyerPays);
+            displayTotalTransfer.innerText = formatRupiah(totalTransfer);
+        }
+
+        // RESET
+        function resetCalc() {
+
+            inputReceive.value = "100000";
+            inputRate.value = "80";
+
+            calculate();
+        }
+
+        // LOAD
+        window.onload = calculate;
+
+    </script>
+
+</body>
+
+</html>
