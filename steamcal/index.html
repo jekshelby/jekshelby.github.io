@@ -135,11 +135,11 @@
                 <!-- INPUT -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    <!-- RECEIVE -->
+                    <!-- BUYER PAYS INPUT -->
                     <div class="flex flex-col gap-2">
 
                         <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                            Target "You Receive" (Bersih)
+                            Wallet Penjual
                         </label>
 
                         <div class="relative">
@@ -148,8 +148,8 @@
                                 Rp
                             </span>
 
-                            <input id="input-receive" class="steam-input pl-12 pr-4 py-3 rounded-lg"
-                                placeholder="100000" type="text" value="100000" autocomplete="off">
+                            <input id="input-buyer-pays" class="steam-input pl-12 pr-4 py-3 rounded-lg"
+                                placeholder="115000" type="text" value="115000" autocomplete="off">
                         </div>
                     </div>
 
@@ -175,23 +175,25 @@
                 <!-- RESULT -->
                 <div class="bg-black/20 rounded-lg p-6 border border-outline-variant flex flex-col gap-4">
 
+                    <!-- YOU RECEIVE -->
                     <div class="flex justify-between items-center gap-4">
 
                         <span class="text-on-surface-variant text-sm md:text-base">
-                            Buyer Pays (Harga Market)
+                            Saldo Bersih
                         </span>
 
-                        <span id="display-buyer-pays" class="text-tertiary text-xl md:text-2xl font-bold">
-                            Rp 115.000
+                        <span id="display-you-receive" class="text-tertiary text-xl md:text-2xl font-bold">
+                            Rp 100.000
                         </span>
                     </div>
 
                     <div class="h-px bg-outline-variant w-full"></div>
 
+                    <!-- TOTAL TRANSFER -->
                     <div class="flex justify-between items-center gap-4">
 
                         <span class="text-on-surface-variant text-sm md:text-base">
-                            Total Transfer ke Rekening
+                            Total Transfer
                         </span>
 
                         <div class="text-right">
@@ -208,7 +210,7 @@
                     </div>
                 </div>
 
-                <!-- BUTTON -->
+                <!-- BUTTON
                 <div class="flex flex-wrap gap-4">
 
                     <button onclick="calculate()"
@@ -226,7 +228,7 @@
 
                         Reset
                     </button>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -280,7 +282,7 @@
                     <div class="bg-primary/10 p-4 rounded-lg border-l-4 border-primary mt-2">
 
                         <p class="text-xs text-primary leading-tight italic">
-                            Rumus: Buyer Pays = You Receive × 1.15
+                            Rumus: You Receive = Buyer Pays ÷ 1.15
                         </p>
                     </div>
                 </div>
@@ -298,10 +300,10 @@
 
     <script>
 
-        const inputReceive = document.getElementById('input-receive');
+        const inputBuyerPays = document.getElementById('input-buyer-pays');
         const inputRate = document.getElementById('input-rate');
 
-        const displayBuyerPays = document.getElementById('display-buyer-pays');
+        const displayYouReceive = document.getElementById('display-you-receive');
         const displayTotalTransfer = document.getElementById('display-total-transfer');
 
         // FORMAT RUPIAH
@@ -325,32 +327,33 @@
             });
         }
 
-        allowOnlyNumbers(inputReceive);
+        allowOnlyNumbers(inputBuyerPays);
         allowOnlyNumbers(inputRate);
 
         // HITUNG
         function calculate() {
 
-            const receive = parseInt(inputReceive.value) || 0;
+            // buyer pays
+            const buyerPays = parseInt(inputBuyerPays.value) || 0;
 
-            // otomatis jadi 0.xx
+            // konversi rate
             const rate = parseFloat("0." + (inputRate.value || 0));
 
-            // buyer pays +15%
-            const buyerPays = Math.ceil(receive * 1.15);
+            // hitung saldo bersih
+            const youReceive = Math.floor(buyerPays / 1.15);
 
-            // transfer
-            const totalTransfer = Math.round(receive * rate);
+            // total transfer
+            const totalTransfer = Math.round(youReceive * rate);
 
             // update ui
-            displayBuyerPays.innerText = formatRupiah(buyerPays);
+            displayYouReceive.innerText = formatRupiah(youReceive);
             displayTotalTransfer.innerText = formatRupiah(totalTransfer);
         }
 
         // RESET
         function resetCalc() {
 
-            inputReceive.value = "100000";
+            inputBuyerPays.value = "115000";
             inputRate.value = "80";
 
             calculate();
