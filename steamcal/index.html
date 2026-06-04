@@ -132,13 +132,26 @@
                     </h2>
                 </div>
 
+                <div class="bg-black/20 p-1 rounded-lg flex">
+                    <button id="seller-tab"
+                        class="flex-1 py-2 rounded-md font-bold text-sm transition-all bg-primary-container text-white">
+                        Penjual
+                    </button>
+
+                    <button id="buyer-tab"
+                        class="flex-1 py-2 rounded-md font-bold text-sm transition-all text-on-surface-variant">
+                        Pembeli
+                    </button>
+                </div>
+
                 <!-- INPUT -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     <!-- BUYER PAYS INPUT -->
                     <div class="flex flex-col gap-2">
 
-                        <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+                        <label id="main-input-label"
+                            class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
                             Wallet Penjual
                         </label>
 
@@ -148,8 +161,8 @@
                                 Rp
                             </span>
 
-                            <input id="input-buyer-pays" class="steam-input pl-12 pr-4 py-3 rounded-lg"
-                                placeholder="115000" type="text" value="115000" autocomplete="off">
+                            <input id="input-main" class="steam-input pl-12 pr-4 py-3 rounded-lg" placeholder="115000"
+                                type="text" value="115000" autocomplete="off">
                         </div>
                     </div>
 
@@ -178,7 +191,7 @@
                     <!-- YOU RECEIVE -->
                     <div class="flex justify-between items-center gap-4">
 
-                        <span class="text-on-surface-variant text-sm md:text-base">
+                        <span id="result-label-1" class="text-on-surface-variant text-sm md:text-base">
                             Saldo Bersih
                         </span>
 
@@ -193,7 +206,7 @@
                     <div class="flex justify-between items-center gap-4">
 
                         <span class="text-on-surface-variant text-sm md:text-base">
-                            Total Transfer
+                            Harga Bersih Setelah Rate
                         </span>
 
                         <div class="text-right">
@@ -203,7 +216,8 @@
                                 Rp 80.000
                             </span>
 
-                            <span class="text-on-surface-variant text-[10px] uppercase tracking-widest font-bold">
+                            <span id="formula-label"
+                                class="text-on-surface-variant text-[10px] uppercase tracking-widest font-bold">
                                 Saldo Bersih × Rate
                             </span>
                         </div>
@@ -298,17 +312,25 @@
         </div>
     </footer>
 
+
     <script>
 
-        const inputBuyerPays = document.getElementById('input-buyer-pays');
+        let currentMode = "seller";
+
+        const inputMain = document.getElementById('input-main');
         const inputRate = document.getElementById('input-rate');
 
         const displayYouReceive = document.getElementById('display-you-receive');
         const displayTotalTransfer = document.getElementById('display-total-transfer');
 
-        // FORMAT RUPIAH
-        function formatRupiah(number) {
+        const sellerTab = document.getElementById('seller-tab');
+        const buyerTab = document.getElementById('buyer-tab');
 
+        const mainInputLabel = document.getElementById('main-input-label');
+        const resultLabel1 = document.getElementById('result-label-1');
+        const formulaLabel = document.getElementById('formula-label');
+
+        function formatRupiah(number) {
             return new Intl.NumberFormat('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
@@ -316,53 +338,88 @@
             }).format(number);
         }
 
-        // HANYA ANGKA
         function allowOnlyNumbers(input) {
-
             input.addEventListener('input', function () {
-
                 this.value = this.value.replace(/[^0-9]/g, '');
-
                 calculate();
             });
         }
 
-        allowOnlyNumbers(inputBuyerPays);
+        allowOnlyNumbers(inputMain);
         allowOnlyNumbers(inputRate);
 
-        // HITUNG
-        function calculate() {
+        function setMode(mode) {
 
-            // buyer pays
-            const buyerPays = parseInt(inputBuyerPays.value) || 0;
+            currentMode = mode;
 
-            // konversi rate
-            const rate = parseFloat("0." + (inputRate.value || 0));
+            if (mode === "seller") {
 
-            // hitung saldo bersih
-            const youReceive = Math.floor(buyerPays / 1.15);
+                sellerTab.classList.add("bg-primary-container", "text-white");
+                buyerTab.classList.remove("bg-primary-container", "text-white");
 
-            // total transfer
-            const totalTransfer = Math.round(youReceive * rate);
+                buyerTab.classList.add("text-on-surface-variant");
 
-            // update ui
-            displayYouReceive.innerText = formatRupiah(youReceive);
-            displayTotalTransfer.innerText = formatRupiah(totalTransfer);
-        }
+                mainInputLabel.innerText = "Wallet Penjual";
+                resultLabel1.innerText = "Wallet Bersih";
+                formulaLabel.innerText = "Wallet Bersih × Rate";
 
-        // RESET
-        function resetCalc() {
+                inputMain.value = "115000";
 
-            inputBuyerPays.value = "115000";
-            inputRate.value = "80";
+            } else {
+
+                buyerTab.classList.add("bg-primary-container", "text-white");
+                sellerTab.classList.remove("bg-primary-container", "text-white");
+
+                sellerTab.classList.add("text-on-surface-variant");
+
+                mainInputLabel.innerText = "Wallet Bersih";
+                resultLabel1.innerText = "Wallet Penjual";
+                formulaLabel.innerText = "Wallet Bersih × Rate";
+
+                inputMain.value = "100000";
+            }
 
             calculate();
         }
 
-        // LOAD
-        window.onload = calculate;
+        sellerTab.addEventListener("click", () => setMode("seller"));
+        buyerTab.addEventListener("click", () => setMode("buyer"));
+
+        function calculate() {
+
+            const mainValue = parseInt(inputMain.value) || 0;
+            const rate = parseFloat("0." + (inputRate.value || 0));
+
+            let saldoBersih = 0;
+            let saldoKotor = 0;
+
+            if (currentMode === "seller") {
+
+                saldoKotor = mainValue;
+                saldoBersih = Math.floor(saldoKotor / 1.15);
+
+                displayYouReceive.innerText = formatRupiah(saldoBersih);
+
+            } else {
+
+                saldoBersih = mainValue;
+                saldoKotor = Math.round(saldoBersih * 1.15);
+
+                displayYouReceive.innerText = formatRupiah(saldoKotor);
+            }
+
+            const totalTransfer = Math.round(saldoBersih * rate);
+
+            displayTotalTransfer.innerText = formatRupiah(totalTransfer);
+        }
+
+        window.onload = () => {
+            inputRate.value = "80";
+            setMode("seller");
+        };
 
     </script>
+
 
 </body>
 
